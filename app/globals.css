@@ -1,26 +1,295 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Infrared / Thermal Operational Theme Tokens */
+  --bg-primary: #090a0d;
+  --bg-surface: #11141a;
+  --bg-surface-elevated: #181d26;
+  --bg-surface-glass: rgba(17, 20, 26, 0.75);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --border-subtle: #202633;
+  --border-prominent: #313a4d;
+  --border-thermal: rgba(245, 158, 11, 0.25);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  /* Semantic Thermal & Meteorological Colors */
+  --thermal-amber: #f59e0b;
+  --thermal-orange: #f97316;
+  --thermal-severe: #ef4444;
+  --thermal-extreme: #f43f5e;
+  --thermal-lowconf: #eab308;
+  --thermal-neutral: #64748b;
+
+  --font-mono-num: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Layout dimensions */
+  --sidebar-width: 220px;
+  --sidebar-width-collapsed: 60px;
+  --topbar-height: 56px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+  background-image: 
+    radial-gradient(ellipse at top center, rgba(245, 158, 11, 0.03) 0%, transparent 60%),
+    linear-gradient(to bottom, #090a0d 0%, #060709 100%);
+  min-height: 100vh;
 }
+
+/* Custom Scrollbar for operational look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090a0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #202633;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #313a4d;
+}
+
+/* Operational grid scanlines */
+.grid-radar {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+
+.radar-sweep {
+  background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(245, 158, 11, 0.12) 330deg, rgba(245, 158, 11, 0.35) 360deg);
+  animation: sweep 6s linear infinite;
+}
+
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Subtle thermal eye pulse */
+@keyframes thermal-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+.animate-thermal-pulse {
+  animation: thermal-pulse 3.5s ease-in-out infinite;
+}
+
+/* Range input styling for evolution timeline scrubber */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #1f2532;
+  height: 6px;
+  border-radius: 3px;
+  border: 1px solid #2d3648;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -5px;
+  background-color: #f59e0b;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  border: 2px solid #090a0d;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background-color: #fbbf24;
+}
+
+/* Glassmorphism surfaces */
+.surface-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+}
+
+.surface-card-elevated {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-prominent);
+  border-radius: 0.75rem;
+}
+
+.glow-amber {
+  box-shadow: 0 0 24px -4px rgba(245, 158, 11, 0.15);
+}
+
+.glow-extreme {
+  box-shadow: 0 0 32px -4px rgba(244, 63, 94, 0.22);
+}
+
+/* ─── Cesium Overrides ────────────────────────────────────────────────────── */
+
+.cesium-viewer {
+  position: absolute;
+  inset: 0;
+}
+
+.cesium-viewer .cesium-widget-credits {
+  display: none !important;
+}
+
+.cesium-viewer .cesium-viewer-toolbar {
+  display: none !important;
+}
+
+.cesium-viewer .cesium-viewer-bottom {
+  display: none !important;
+}
+
+/* ─── Globe Container ─────────────────────────────────────────────────────── */
+
+.globe-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ─── Cyclone marker pulse ────────────────────────────────────────────────── */
+
+@keyframes cyclone-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(245, 158, 11, 0);
+  }
+}
+
+.animate-cyclone-pulse {
+  animation: cyclone-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Fade in animation ───────────────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* ─── Upload Dropzone ─────────────────────────────────────────────────────── */
+
+.upload-dropzone {
+  position: relative;
+  border: 2px dashed var(--border-subtle);
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: var(--bg-surface);
+}
+
+.upload-dropzone:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.03);
+}
+
+.upload-dropzone.drag-active {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: rgba(245, 158, 11, 0.06);
+  box-shadow: 0 0 32px -8px rgba(245, 158, 11, 0.2);
+}
+
+.upload-dropzone.has-file {
+  border-color: var(--border-prominent);
+  border-style: solid;
+  padding: 1.5rem;
+}
+
+/* ─── Processing pulse ────────────────────────────────────────────────────── */
+
+@keyframes analysis-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 24px 4px rgba(245, 158, 11, 0.15);
+  }
+}
+
+.animate-analysis-pulse {
+  animation: analysis-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Heatmap Legend ──────────────────────────────────────────────────────── */
+
+.heatmap-legend-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(
+    to right,
+    #3b82f6,
+    #22c55e,
+    #eab308,
+    #f97316,
+    #ef4444,
+    #f43f5e
+  );
+}
+
+/* ─── Result image hover ──────────────────────────────────────────────────── */
+
+.result-image-card {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.result-image-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.4);
+}
+
