@@ -1,6 +1,6 @@
-# CYCLONE
+# CYCLONEX
 
-CYCLONE is a Next.js-based cyclone monitoring and forecasting dashboard built for monitoring active tropical systems, reviewing historical season data, and exploring AI-assisted satellite analysis.
+CYCLONEX is a Next.js-based cyclone monitoring and forecasting dashboard built for monitoring active tropical systems, reviewing historical season data, and exploring AI-assisted satellite analysis.
 
 The app presents a dark-mode operations dashboard with a global cyclone map, tracked systems, forecast information, alert summaries, and analysis workflows designed for meteorological or disaster-response use cases.
 
